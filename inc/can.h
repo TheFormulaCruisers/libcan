@@ -13,7 +13,7 @@
  * Currently, the transfer speed is set to 1MBps, the protocol revision is set
  * to 2.0A and no interrupts are enabled.
  */
-void can_init(uint16_t txid);
+void can_init(const uint16_t txid);
 
 /**
  * @brief Configure a message object to filter on a specific message ID.
@@ -36,7 +36,7 @@ void can_init(uint16_t txid);
  * filtering for messages with higher ids, since an id of 0 indicates that the
  * message object is not initialized.
  */
-void can_filter(uint16_t rxid);
+void can_filter(const uint16_t rxid);
 
 /**
  * @brief Retrieve a message from the first message object with a set rx flag.
