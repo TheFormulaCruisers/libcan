@@ -2,23 +2,24 @@
 # Parameters
 #===========
 
-APPNAME     = can
 CXX         = avr-gcc
 CXXFLAGS    = -Wall
 LIBS        = -Iinc
 DEVICE		= at90can128
 FCPU		= 16000000
-OFILES		= test.o can.o
 
 #
 # Make
 #===========
 
-main: $(OFILES)
-	$(CXX) $(CXXFLAGS) -mmcu=$(DEVICE) -DF_CPU=$(FCPU) -o bin/$(APPNAME) $(OFILES)
+CAN_O = can_tests.o can.o
+CAN_BIN = can_tests
 
-test.o: src/test.c
-	$(CXX) $(CXXFLAGS) -mmcu=$(DEVICE) -DF_CPU=$(FCPU) -c src/test.c $(LIBS)
+can_build: $(CAN_O)
+	$(CXX) $(CXXFLAGS) -mmcu=$(DEVICE) -DF_CPU=$(FCPU) -o bin/$(CAN_BIN) $(CAN_O)
+
+can_tests.o: tests/can_tests.c
+	$(CXX) $(CXXFLAGS) -mmcu=$(DEVICE) -DF_CPU=$(FCPU) -c tests/can_tests.c $(LIBS)
 
 can.o: src/can.c
 	$(CXX) $(CXXFLAGS) -mmcu=$(DEVICE) -DF_CPU=$(FCPU) -c src/can.c $(LIBS)
