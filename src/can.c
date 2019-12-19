@@ -17,7 +17,7 @@ static uint32_t _id_to_idt_2b(uint16_t id) {
 		(uint32_t)(uint8_t)(id >> 13) << 16;
 }
 
-void can_init(uint16_t txid) {
+void can_init(const uint16_t txid) {
 
 	// Reset CAN controller
 	CANGCON = _BV(SWRES);
@@ -51,7 +51,7 @@ void can_init(uint16_t txid) {
 	CANGCON = _BV(ENASTB);
 }
 
-void can_filter(uint16_t rxid) {
+void can_filter(const uint16_t rxid) {
     
 	uint8_t dat_i;
 	for (dat_i = 1; dat_i < 14; dat_i++) {
