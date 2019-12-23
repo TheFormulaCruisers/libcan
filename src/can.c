@@ -66,7 +66,7 @@ void can_filter(const uint16_t rxid) {
 
 void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
 
-	uint8_t mob_i;
+	uint8_t mob_i, dat_i;
 	for (mob_i = 1; mob_i < 14; mob_i++) {
 
 		// Select MOb[i]
@@ -82,7 +82,6 @@ void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
 			*len = CANCDMOB & 0x0F;
 
 			// Get message
-			uint8_t dat_i;
 			for (dat_i = 0; dat_i < *len; dat_i++) {
 				*(dat+dat_i) = CANMSG;
 			}
