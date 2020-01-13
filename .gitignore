@@ -1,1 +1,3 @@
 *.o
+/tools/mplabx/build/
+/tools/mplabx/dist/

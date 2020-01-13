@@ -13,7 +13,7 @@
  * Currently, the transfer speed is set to 1MBps, the protocol revision is set
  * to 2.0A and no interrupts are enabled.
  */
-void can_init(const uint16_t txid);
+void can_init(uint16_t txid);
 
 /**
  * @brief Configure a message object to filter on a specific message ID.
@@ -36,7 +36,18 @@ void can_init(const uint16_t txid);
  * filtering for messages with higher ids, since an id of 0 indicates that the
  * message object is not initialized.
  */
-void can_filter(const uint16_t rxid);
+void can_filter(uint16_t rxid);
+
+/**
+ * @brief Register the receive handler.
+ * @param receive_handler
+ * @return void
+ *
+ * The receive handler is called right after a CAN receive interrupt occurs.
+ * The callback function is expected to take three parameters: the node id, a
+ * pointer to the data and the number of bytes received.
+ */
+void can_register_receive_handler(void (*receive_handler)(uint16_t id, uint8_t *dat, uint8_t len));
 
 /**
  * @brief Retrieve a message from the first message object with a set rx flag.

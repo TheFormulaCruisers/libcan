@@ -1,19 +1,38 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <can.h>
+#include <extra/flag.h>
+
+// ---------------------------------------------------------------- Definitions
 
 // Convert an ID to the CAN revision 2.0A IDT-register format.
 #define _ID_TO_IDT_2A(id) \
 	(uint32_t)(uint8_t)(id << 5) << 16 | \
-	(uint32_t)(uint8_t)(id >> 3) << 24;
+	(uint32_t)(uint8_t)(id >> 3) << 24
 
 // Convert an ID to the CAN revision 2.0B IDT-register format.
 #define _ID_TO_IDT_2B(id) \
 	(uint32_t)(uint8_t)(id << 3) | \
 	(uint32_t)(uint8_t)(id >> 5) << 8 | \
-	(uint32_t)(uint8_t)(id >> 13) << 16;
+	(uint32_t)(uint8_t)(id >> 13) << 16
 
-void can_init(const uint16_t txid) {
+// Convert the CAN revision 2.0A IDT-register format to an ID.
+#define _IDT_2A_TO_ID(canidt) \
+	(uint16_t)(uint8_t)(canidt >> 13) | \
+	(uint16_t)(uint8_t)(canidt) << 3
+
+// Convert the CAN revision 2.0B IDT-register format to an ID.
+#define _IDT_2B_TO_ID(canidt) \
+	(uint32_t)(uint8_t)((canidt >> 3) | \
+	(uint32_t)(uint8_t)((canidt) << 0)
+
+// --------------------------------------------------------------------- Memory
+
+static volatile void (*handle_receive)(uint16_t id, uint8_t *dat, uint8_t len);
+
+// --------------------------------------------------------- External Functions
+
+void can_init(uint16_t txid) {
 
 	// Reset CAN controller
 	CANGCON = _BV(SWRES);
@@ -24,7 +43,7 @@ void can_init(const uint16_t txid) {
 	CANBT3 = 0x13;
 
 	// Enable interrupt(s)
-	CANGIE = _BV(ENIT);
+	CANGIE = _BV(ENIT) | _BV(ENRX);
 
 	// Initialize MOb0 (tx)
 	CANPAGE = 0x00;
@@ -47,7 +66,7 @@ void can_init(const uint16_t txid) {
 	CANGCON = _BV(ENASTB);
 }
 
-void can_filter(const uint16_t rxid) {
+void can_filter(uint16_t rxid) {
     
 	uint8_t dat_i;
 	for (dat_i = 1; dat_i < 14; dat_i++) {
@@ -62,6 +81,12 @@ void can_filter(const uint16_t rxid) {
 			break;
 		}
 	}
+}
+
+void can_register_receive_handler(void (*receive_handler)(uint16_t id, uint8_t *dat, uint8_t len)) {
+
+	// Register the receive handler
+	handle_receive = receive_handler;
 }
 
 void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
@@ -107,4 +132,30 @@ void can_transmit(uint8_t *dat, uint8_t len) {
 
 	// Set message length and start transmission
 	CANCDMOB = (CANCDMOB & _BV(IDE)) | _BV(CONMOB0) | (len & 0x0F);
+}
+
+// ------------------------------------------------- Interrupt Service Routines
+
+ISR(CANIT_vect) {
+
+	int16_t id;
+	int8_t dat_i, dat[8], len;
+	
+	// Select MOb
+	CANPAGE = flag_pos_16((uint16_t)CANSIT) << 4;
+
+	// Get ID
+	id = _IDT_2A_TO_ID(CANIDT);
+
+	// Get message length
+	len = CANCDMOB & 0x0F;
+
+	// Get message
+	for (dat_i = 0; dat_i < len; dat_i++) {
+		dat[dat_i] = CANMSG;
+	}
+
+	// Reset reception bit and re-enable reception
+	CANSTMOB &= ~_BV(RXOK);
+	CANCDMOB = _BV(CONMOB1);
 }
