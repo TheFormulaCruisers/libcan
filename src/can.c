@@ -54,12 +54,12 @@ void can_init(uint16_t txid) {
 	CANIDM = 0xFFFFFFFF;
 	CANIDT = _ID_TO_IDT_2B(txid);
 	
-	#ifdef CAN_REV_2A
-		CANCDMOB = 0x00;
-	#endif
-	#ifdef CAN_REV_2B
-		CANCDMOB = _BV(IDE);
-	#endif
+#ifdef CAN_REV_2A
+	CANCDMOB = 0x00;
+#endif
+#ifdef CAN_REV_2B
+	CANCDMOB = _BV(IDE);
+#endif
 
 	// Initialize MOb1 to MOb14 (rx)
 	uint8_t dat_i;
@@ -70,12 +70,12 @@ void can_init(uint16_t txid) {
 		CANIDM = 0xFFFFFFFF;
 		CANIDT = 0x00000000;
 
-		#ifdef CAN_REV_2A
-			CANCDMOB = 0x00;
-		#endif
-		#ifdef CAN_REV_2B
-			CANCDMOB = _BV(IDE);
-		#endif
+#ifdef CAN_REV_2A
+		CANCDMOB = 0x00;
+#endif
+#ifdef CAN_REV_2B
+		CANCDMOB = _BV(IDE);
+#endif
 	}
 
 	// Enable CAN controller
@@ -93,12 +93,12 @@ void can_filter(uint16_t rxid) {
 		// Use MOb[i] if its id is zero (i.e. not yet set)
 		if (CANIDT == 0x00000000) {
 			
-			#ifdef CAN_REV_2A
-				CANIDT = _ID_TO_IDT_2A(rxid);
-			#endif
-			#ifdef CAN_REV_2B
-				CANIDT = _ID_TO_IDT_2B(rxid);
-			#endif
+#ifdef CAN_REV_2A
+			CANIDT = _ID_TO_IDT_2A(rxid);
+#endif
+#ifdef CAN_REV_2B
+			CANIDT = _ID_TO_IDT_2B(rxid);
+#endif
 
 			CANCDMOB = _BV(CONMOB1);
 			break;
@@ -124,12 +124,12 @@ void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
 		if (CANSTMOB & _BV(RXOK)) {
 
 			// Get id
-			#ifdef CAN_REV_2A
+#ifdef CAN_REV_2A
 				*rxid = _IDT_2A_TO_ID(CANIDT);
-			#endif
-			#ifdef CAN_REV_2B
+#endif
+#ifdef CAN_REV_2B
 				*rxid = _IDT_2B_TO_ID(CANIDT);
-			#endif
+#endif
 
 			// Get message length
 			*len = CANCDMOB & 0x0F;
