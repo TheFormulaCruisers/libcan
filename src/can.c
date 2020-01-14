@@ -51,11 +51,10 @@ void can_init(uint16_t txid) {
 	CANPAGE = 0x00;
 	CANSTMOB = 0x00;
 	CANIDM = 0xFFFFFFFF;
-#ifdef CAN_REV_2A
+#if defined CAN_REV_2A
 	CANCDMOB = 0x00;
 	CANIDT = _ID_TO_IDT_2A(txid);
-#endif
-#ifdef CAN_REV_2B
+#elif defined CAN_REV_2B
 	CANCDMOB = _BV(IDE);
 	CANIDT = _ID_TO_IDT_2B(txid);
 #endif
@@ -63,14 +62,14 @@ void can_init(uint16_t txid) {
 	// Initialize MOb1 to MOb14 (rx)
 	uint8_t dat_i;
 	for (dat_i = 1; dat_i < 14; dat_i++) {
+
 		CANPAGE = dat_i << 4;
 		CANSTMOB = 0x00;
 		CANIDM = 0xFFFFFFFF;
 		CANIDT = 0x00000000;
-#ifdef CAN_REV_2A
+#if defined CAN_REV_2A
 		CANCDMOB = 0x00;
-#endif
-#ifdef CAN_REV_2B
+#elif defined CAN_REV_2B
 		CANCDMOB = _BV(IDE);
 #endif
 	}
@@ -89,10 +88,10 @@ void can_filter(uint16_t rxid) {
 
 		// Use MOb[i] if its id is zero (i.e. not yet set)
 		if (CANIDT == 0x00000000) {
-#ifdef CAN_REV_2A
+
+#if defined CAN_REV_2A
 			CANIDT = _ID_TO_IDT_2A(rxid);
-#endif
-#ifdef CAN_REV_2B
+#elif defined CAN_REV_2B
 			CANIDT = _ID_TO_IDT_2B(rxid);
 #endif
 			CANCDMOB = _BV(CONMOB1);
@@ -119,10 +118,9 @@ void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
 		if (CANSTMOB & _BV(RXOK)) {
 
 			// Get id
-#ifdef CAN_REV_2A
+#if defined CAN_REV_2A
 			*rxid = _IDT_2A_TO_ID(CANIDT);
-#endif
-#ifdef CAN_REV_2B
+#elif defined CAN_REV_2B
 			*rxid = _IDT_2B_TO_ID(CANIDT);
 #endif
 
