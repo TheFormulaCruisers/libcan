@@ -6,12 +6,14 @@
 
 // Check CAN revision both defined
 #if defined CAN_REV_2A && defined CAN_REV_2B
+#warning "Both CAN revisions defined. Using 2.0B."
 #undef CAN_REV_2A
 #define CAN_REV_2B
 #endif
 
 // Check CAN revision not defined
-#if !defined CAN_REV_2A || !defined CAN_REV_2B
+#if !defined CAN_REV_2A && !defined CAN_REV_2B
+#warning "No CAN revision defined. Using 2.0B."
 #define CAN_REV_2B
 #endif
 

@@ -4,6 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>../../inc/can.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -12,17 +13,14 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>../../tests/can_test.c</itemPath>
+      <itemPath>../../src/can.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <itemPath>../../inc/can.h</itemPath>
-    <itemPath>../../src/can.c</itemPath>
-    <itemPath>../../tests/can_test.c</itemPath>
-    <itemPath>../../libs/libextra/inc/extra/flag.h</itemPath>
-    <itemPath>../../libs/libextra/src/flag.c</itemPath>
   </logicalFolder>
   <sourceRootList>
     <Elem>../../inc</Elem>
@@ -141,8 +139,7 @@
         <property key="verbose" value="false"/>
       </AVR-GCC>
       <AVR-Global>
-        <property key="common-include-directories"
-                  value="../../inc;../../libs/libextra/inc"/>
+        <property key="common-include-directories" value="../../inc"/>
         <property key="eep" value="false"/>
         <property key="external-ram-check" value="false"/>
         <property key="hex" value="true"/>
