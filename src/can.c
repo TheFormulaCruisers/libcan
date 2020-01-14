@@ -4,6 +4,17 @@
 
 // ---------------------------------------------------------------- Definitions
 
+// Check CAN revision both defined
+#if defined CAN_REV_2A && defined CAN_REV_2B
+#undef CAN_REV_2A
+#define CAN_REV_2B
+#endif
+
+// Check CAN revision not defined
+#if !defined CAN_REV_2A || !defined CAN_REV_2B
+#define CAN_REV_2B
+#endif
+
 // Convert an ID to the CAN revision 2.0A IDT-register format.
 #define _ID_TO_IDT_2A(id) (uint32_t)id << 21
 
@@ -38,18 +49,31 @@ void can_init(uint16_t txid) {
 	// Initialize MOb0 (tx)
 	CANPAGE = 0x00;
 	CANSTMOB = 0x00;
-	CANCDMOB = 0x00;
 	CANIDM = 0xFFFFFFFF;
 	CANIDT = _ID_TO_IDT_2B(txid);
+	
+	#ifdef CAN_REV_2A
+		CANCDMOB = 0x00;
+	#endif
+	#ifdef CAN_REV_2B
+		CANCDMOB = _BV(IDE);
+	#endif
 
 	// Initialize MOb1 to MOb14 (rx)
 	uint8_t dat_i;
 	for (dat_i = 1; dat_i < 14; dat_i++) {
+
 		CANPAGE = dat_i << 4;
 		CANSTMOB = 0x00;
-		CANCDMOB = 0x00;
 		CANIDM = 0xFFFFFFFF;
 		CANIDT = 0x00000000;
+
+		#ifdef CAN_REV_2A
+			CANCDMOB = 0x00;
+		#endif
+		#ifdef CAN_REV_2B
+			CANCDMOB = _BV(IDE);
+		#endif
 	}
 
 	// Enable CAN controller
@@ -66,7 +90,14 @@ void can_filter(uint16_t rxid) {
 
 		// Use MOb[i] if its id is zero (i.e. not yet set)
 		if (CANIDT == 0x00000000) {
-			CANIDT = _ID_TO_IDT_2B(rxid);
+			
+			#ifdef CAN_REV_2A
+				CANIDT = _ID_TO_IDT_2A(rxid);
+			#endif
+			#ifdef CAN_REV_2B
+				CANIDT = _ID_TO_IDT_2B(rxid);
+			#endif
+
 			CANCDMOB = _BV(CONMOB1);
 			break;
 		}
@@ -76,7 +107,7 @@ void can_filter(uint16_t rxid) {
 void can_register_receive_handler(void (*receive_handler)(uint16_t id, uint8_t *dat, uint8_t len)) {
 
 	// Register the receive handler
-	handle_receive = receive_handler;
+	handle_receive = (volatile void *)receive_handler;
 }
 
 void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
@@ -91,7 +122,12 @@ void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
 		if (CANSTMOB & _BV(RXOK)) {
 
 			// Get id
-			*rxid = _IDT_2B_TO_ID(CANIDT);
+			#ifdef CAN_REV_2A
+				*rxid = _IDT_2A_TO_ID(CANIDT);
+			#endif
+			#ifdef CAN_REV_2B
+				*rxid = _IDT_2B_TO_ID(CANIDT);
+			#endif
 
 			// Get message length
 			*len = CANCDMOB & 0x0F;
