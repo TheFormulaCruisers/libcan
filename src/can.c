@@ -52,13 +52,14 @@ void can_init(uint16_t txid) {
 	CANPAGE = 0x00;
 	CANSTMOB = 0x00;
 	CANIDM = 0xFFFFFFFF;
-	CANIDT = _ID_TO_IDT_2B(txid);
-	
+
 #ifdef CAN_REV_2A
 	CANCDMOB = 0x00;
+	CANIDT = _ID_TO_IDT_2A(txid);
 #endif
 #ifdef CAN_REV_2B
 	CANCDMOB = _BV(IDE);
+	CANIDT = _ID_TO_IDT_2B(txid);
 #endif
 
 	// Initialize MOb1 to MOb14 (rx)
