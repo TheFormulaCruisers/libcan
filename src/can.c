@@ -29,6 +29,8 @@
 // Convert the CAN revision 2.0B IDT-register format to an ID.
 #define _IDT_2B_TO_ID(canidt) canidt >> 3
 
+// ---------------------------------------------------------------------- Types
+
 // --------------------------------------------------------------------- Memory
 
 static volatile uint8_t mobs_in_use = 1;
@@ -37,6 +39,7 @@ static volatile void (*handle_receive)(uint16_t id, uint8_t *dat, uint8_t len) =
 // --------------------------------------------------------- External Functions
 
 void can_init(uint16_t txid) {
+	uint8_t dat_i;
 
 	// Reset CAN controller
 	CANGCON = _BV(SWRES);
@@ -62,7 +65,6 @@ void can_init(uint16_t txid) {
 	#endif
 
 	// Initialize MOb1 to MOb14 (rx)
-	uint8_t dat_i;
 	for (dat_i = 1; dat_i < 14; dat_i++) {
 		CANPAGE = dat_i << 4;
 		CANSTMOB = 0x00;
@@ -102,53 +104,47 @@ void can_filter(uint16_t rxid) {
 
 void can_register_receive_handler(void (*receive_handler)(uint16_t id, uint8_t *dat, uint8_t len)) {
 
-	// Register the receive handler
+	// Register handle
 	handle_receive = (volatile void *)receive_handler;
 }
 
 void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
-
-	uint8_t mob_i, dat_i;
-	for (mob_i = 1; mob_i < mobs_in_use; mob_i++) {
-
-		// Select MOb[i]
-		CANPAGE = mob_i << 4;
-
-		// Read MOb[i] if its reception bit has been set
+	uint8_t cp, cp_max, dat_i;
+	
+	// Find MOb with set rx flag
+	cp_max = mobs_in_use << 4;
+	for (cp = 0x10; cp < cp_max; cp+=0x10) {
+		CANPAGE = cp;
 		if (CANSTMOB & _BV(RXOK)) {
-
-			// Get id
-			#if defined CAN_REV_2A
-			*rxid = _IDT_2A_TO_ID(CANIDT);
-			#elif defined CAN_REV_2B
-			*rxid = _IDT_2B_TO_ID(CANIDT);
-			#endif
-
-			// Get message length
-			*len = CANCDMOB & 0x0F;
-
-			// Get message
-			for (dat_i = 0; dat_i < *len; dat_i++) {
-				*(dat+dat_i) = CANMSG;
-			}
-
-			// Reset reception bit
-			CANSTMOB &= ~_BV(RXOK);
-
-			// Enable reception
-			CANCDMOB |= _BV(CONMOB1);
 			break;
 		}
 	}
+
+	// Copy id
+	#if defined CAN_REV_2A
+	*rxid = _IDT_2A_TO_ID(CANIDT);
+	#elif defined CAN_REV_2B
+	*rxid = _IDT_2B_TO_ID(CANIDT);
+	#endif
+
+	// Copy message length and message
+	*len = CANCDMOB & 0x0F;
+	for (dat_i = 0; dat_i < *len; dat_i++) {
+		*(dat+dat_i) = CANMSG;
+	}
+
+	// Reset rx flag and re-enable reception
+	CANSTMOB &= ~_BV(RXOK);
+	CANCDMOB |= _BV(CONMOB1);
 }
 
 void can_transmit(uint8_t *dat, uint8_t len) {
+	uint8_t dat_i;
 
 	// Select MOb0
 	CANPAGE = 0x00;
 
 	// Set message
-	uint8_t dat_i;
 	for (dat_i = 0; dat_i < len; dat_i++) {
 		CANMSG = *(dat+dat_i);
 	}

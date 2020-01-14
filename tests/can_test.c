@@ -62,6 +62,6 @@ int can_test_rx(void) {
 }
 
 int main(void) {
-    can_test_tx();
+    can_test_rx();
     return 0;
 }
