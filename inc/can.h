@@ -20,21 +20,17 @@ void can_init(uint16_t txid);
  * @param rxid The message ID to filter on.
  * @return void
  *
- * Searches for an unused message object and configures it to filter the bus on
- * messages with the message ID specified. Message objects are utilized
- * chronologically and reception is enabled immediately.
+ * Selects the next available message object and configures it to filter the
+ * bus on messages with the message ID specified. Message objects are 
+ * utilized chronologically and reception is enabled immediately.
  * 
  * The first message object is reserved for transmission and will not be
  * available for reception. The transmission message object uses message ID 0
  * and has the highest priority on the bus.
  *
  * Best practice is to filter messages in descending order of priority. That
- * way, the receive function will always favor a high priority message over a
- * low priority message.
- *
- * @bug Currently, filtered messages with an id of 0 are discarded when also
- * filtering for messages with higher ids, since an id of 0 indicates that the
- * message object is not initialized.
+ * way, the receive function will favor a high priority message over a low
+ * priority message.
  */
 void can_filter(uint16_t rxid);
 
@@ -46,6 +42,8 @@ void can_filter(uint16_t rxid);
  * The receive handler is called right after a CAN receive interrupt occurs.
  * The callback function is expected to take three parameters: the node id, a
  * pointer to the data and the number of bytes received.
+ *
+ * @note Not yet implemented.
  */
 void can_register_receive_handler(void (*receive_handler)(uint16_t id, uint8_t *dat, uint8_t len));
 

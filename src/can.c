@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <stddef.h>
 #include <can.h>
 
 // ---------------------------------------------------------------- Definitions
@@ -30,7 +31,8 @@
 
 // --------------------------------------------------------------------- Memory
 
-static volatile void (*handle_receive)(uint16_t id, uint8_t *dat, uint8_t len);
+static volatile uint8_t mobs_in_use = 1;
+static volatile void (*handle_receive)(uint16_t id, uint8_t *dat, uint8_t len) = NULL;
 
 // --------------------------------------------------------- External Functions
 
@@ -78,24 +80,24 @@ void can_init(uint16_t txid) {
 }
 
 void can_filter(uint16_t rxid) {
-    
-	uint8_t dat_i;
-	for (dat_i = 1; dat_i < 14; dat_i++) {
 
-		// Select MOb[i]
-		CANPAGE = dat_i << 4;		
-
-		// Use MOb[i] if its id is zero (i.e. not yet set)
-		if (CANIDT == 0x00000000) {
-			#if defined CAN_REV_2A
-			CANIDT = _ID_TO_IDT_2A(rxid);
-			#elif defined CAN_REV_2B
-			CANIDT = _ID_TO_IDT_2B(rxid);
-			#endif
-			CANCDMOB = _BV(CONMOB1);
-			break;
-		}
+	// Abort if all MObs are in use
+	if (mobs_in_use > 14) {
+		return;
 	}
+
+	// Select MOb
+	CANPAGE = mobs_in_use++ << 4;
+
+	// Set MOb id
+	#if defined CAN_REV_2A
+	CANIDT = _ID_TO_IDT_2A(rxid);
+	#elif defined CAN_REV_2B
+	CANIDT = _ID_TO_IDT_2B(rxid);
+	#endif
+
+	// Enable reception
+	CANCDMOB |= _BV(CONMOB1);
 }
 
 void can_register_receive_handler(void (*receive_handler)(uint16_t id, uint8_t *dat, uint8_t len)) {
@@ -107,7 +109,7 @@ void can_register_receive_handler(void (*receive_handler)(uint16_t id, uint8_t *
 void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
 
 	uint8_t mob_i, dat_i;
-	for (mob_i = 1; mob_i < 14; mob_i++) {
+	for (mob_i = 1; mob_i < mobs_in_use; mob_i++) {
 
 		// Select MOb[i]
 		CANPAGE = mob_i << 4;
@@ -130,9 +132,11 @@ void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
 				*(dat+dat_i) = CANMSG;
 			}
 
-			// Reset reception bit and re-enable reception
+			// Reset reception bit
 			CANSTMOB &= ~_BV(RXOK);
-			CANCDMOB = _BV(CONMOB1);
+
+			// Enable reception
+			CANCDMOB |= _BV(CONMOB1);
 			break;
 		}
 	}
@@ -149,8 +153,11 @@ void can_transmit(uint8_t *dat, uint8_t len) {
 		CANMSG = *(dat+dat_i);
 	}
 
-	// Set message length and start transmission
-	CANCDMOB = (CANCDMOB & _BV(IDE)) | _BV(CONMOB0) | (len & 0x0F);
+	// Set message length
+	CANCDMOB = (CANCDMOB & 0xF0) | len;
+
+	// Start transmission
+	CANCDMOB |= _BV(CONMOB0);
 }
 
 // ------------------------------------------------- Interrupt Service Routines

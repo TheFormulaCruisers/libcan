@@ -22,12 +22,12 @@ int can_test_tx(void) {
 		for (ledi = 0; ledi < duration; ledi++);
 		if (leds == 0x80) {
 			dir = 1;
-			} else if (leds == 0x01) {
+		} else if (leds == 0x01) {
 			dir = 0;
 		}
 		if (dir) {
 			leds >>= 1;
-			} else {
+		} else {
 			leds <<= 1;
 		}
 		PORTC = leds;
@@ -39,7 +39,7 @@ int can_test_tx(void) {
 
 int can_test_rx(void) {
 	
-	can_init(2);
+	can_init(1);
 	can_filter(0);
 	sei();
 
@@ -62,6 +62,6 @@ int can_test_rx(void) {
 }
 
 int main(void) {
-    can_test_rx();
+    can_test_tx();
     return 0;
 }

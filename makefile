@@ -4,7 +4,7 @@
 
 CXX         = avr-gcc
 CXXFLAGS    = -Wall
-LIBS        = -Iinc -Ilibs/libextra/inc
+LIBS        = -Iinc
 DEVICE		= at90can128
 FCPU		= 16000000
 
@@ -22,7 +22,7 @@ can_test.o: tests/can_test.c
 	$(CXX) $(CXXFLAGS) -mmcu=$(DEVICE) -DF_CPU=$(FCPU) -c tests/can_test.c $(LIBS)
 
 can.o: src/can.c
-	$(CXX) $(CXXFLAGS) -mmcu=$(DEVICE) -DF_CPU=$(FCPU) -c src/can.c $(LIBS)
+	$(CXX) $(CXXFLAGS) -mmcu=$(DEVICE) -DF_CPU=$(FCPU) -DCAN_REV_2B -c src/can.c $(LIBS)
 
 clean:
 	rm *.o
