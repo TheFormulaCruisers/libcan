@@ -8,7 +8,6 @@
 #if defined CAN_REV_2A && defined CAN_REV_2B
 #warning "Both CAN revisions defined. Using 2.0B."
 #undef CAN_REV_2A
-#define CAN_REV_2B
 #endif
 
 // Check CAN revision not defined
@@ -52,7 +51,6 @@ void can_init(uint16_t txid) {
 	CANPAGE = 0x00;
 	CANSTMOB = 0x00;
 	CANIDM = 0xFFFFFFFF;
-
 #ifdef CAN_REV_2A
 	CANCDMOB = 0x00;
 	CANIDT = _ID_TO_IDT_2A(txid);
@@ -65,12 +63,10 @@ void can_init(uint16_t txid) {
 	// Initialize MOb1 to MOb14 (rx)
 	uint8_t dat_i;
 	for (dat_i = 1; dat_i < 14; dat_i++) {
-
 		CANPAGE = dat_i << 4;
 		CANSTMOB = 0x00;
 		CANIDM = 0xFFFFFFFF;
 		CANIDT = 0x00000000;
-
 #ifdef CAN_REV_2A
 		CANCDMOB = 0x00;
 #endif
@@ -93,14 +89,12 @@ void can_filter(uint16_t rxid) {
 
 		// Use MOb[i] if its id is zero (i.e. not yet set)
 		if (CANIDT == 0x00000000) {
-			
 #ifdef CAN_REV_2A
 			CANIDT = _ID_TO_IDT_2A(rxid);
 #endif
 #ifdef CAN_REV_2B
 			CANIDT = _ID_TO_IDT_2B(rxid);
 #endif
-
 			CANCDMOB = _BV(CONMOB1);
 			break;
 		}
