@@ -62,7 +62,6 @@ void can_init(uint16_t txid) {
 	// Initialize MOb1 to MOb14 (rx)
 	uint8_t dat_i;
 	for (dat_i = 1; dat_i < 14; dat_i++) {
-
 		CANPAGE = dat_i << 4;
 		CANSTMOB = 0x00;
 		CANIDM = 0xFFFFFFFF;
@@ -88,7 +87,6 @@ void can_filter(uint16_t rxid) {
 
 		// Use MOb[i] if its id is zero (i.e. not yet set)
 		if (CANIDT == 0x00000000) {
-
 #if defined CAN_REV_2A
 			CANIDT = _ID_TO_IDT_2A(rxid);
 #elif defined CAN_REV_2B
