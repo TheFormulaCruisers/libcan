@@ -125,10 +125,10 @@ void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
 
 			// Get id
 #ifdef CAN_REV_2A
-				*rxid = _IDT_2A_TO_ID(CANIDT);
+			*rxid = _IDT_2A_TO_ID(CANIDT);
 #endif
 #ifdef CAN_REV_2B
-				*rxid = _IDT_2B_TO_ID(CANIDT);
+			*rxid = _IDT_2B_TO_ID(CANIDT);
 #endif
 
 			// Get message length
