@@ -1,30 +1,20 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <can.h>
-#include <extra/flag.h>
 
 // ---------------------------------------------------------------- Definitions
 
 // Convert an ID to the CAN revision 2.0A IDT-register format.
-#define _ID_TO_IDT_2A(id) \
-	(uint32_t)(uint8_t)(id << 5) << 16 | \
-	(uint32_t)(uint8_t)(id >> 3) << 24
+#define _ID_TO_IDT_2A(id) (uint32_t)id << 21
 
 // Convert an ID to the CAN revision 2.0B IDT-register format.
-#define _ID_TO_IDT_2B(id) \
-	(uint32_t)(uint8_t)(id << 3) | \
-	(uint32_t)(uint8_t)(id >> 5) << 8 | \
-	(uint32_t)(uint8_t)(id >> 13) << 16
+#define _ID_TO_IDT_2B(id) (uint32_t)id << 3
 
 // Convert the CAN revision 2.0A IDT-register format to an ID.
-#define _IDT_2A_TO_ID(canidt) \
-	(uint16_t)(uint8_t)(canidt >> 13) | \
-	(uint16_t)(uint8_t)(canidt) << 3
+#define _IDT_2A_TO_ID(canidt) canidt >> 21
 
 // Convert the CAN revision 2.0B IDT-register format to an ID.
-#define _IDT_2B_TO_ID(canidt) \
-	(uint32_t)(uint8_t)((canidt >> 3) | \
-	(uint32_t)(uint8_t)((canidt) << 0)
+#define _IDT_2B_TO_ID(canidt) canidt >> 3
 
 // --------------------------------------------------------------------- Memory
 
@@ -50,7 +40,7 @@ void can_init(uint16_t txid) {
 	CANSTMOB = 0x00;
 	CANCDMOB = 0x00;
 	CANIDM = 0xFFFFFFFF;
-	CANIDT = _ID_TO_IDT_2A(txid);
+	CANIDT = _ID_TO_IDT_2B(txid);
 
 	// Initialize MOb1 to MOb14 (rx)
 	uint8_t dat_i;
@@ -76,7 +66,7 @@ void can_filter(uint16_t rxid) {
 
 		// Use MOb[i] if its id is zero (i.e. not yet set)
 		if (CANIDT == 0x00000000) {
-			CANIDT = _ID_TO_IDT_2A(rxid);
+			CANIDT = _ID_TO_IDT_2B(rxid);
 			CANCDMOB = _BV(CONMOB1);
 			break;
 		}
@@ -101,7 +91,7 @@ void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len) {
 		if (CANSTMOB & _BV(RXOK)) {
 
 			// Get id
-			*rxid = CANIDT2 >> 5 | CANIDT1 << 3;
+			*rxid = _IDT_2B_TO_ID(CANIDT);
 
 			// Get message length
 			*len = CANCDMOB & 0x0F;
@@ -137,25 +127,4 @@ void can_transmit(uint8_t *dat, uint8_t len) {
 // ------------------------------------------------- Interrupt Service Routines
 
 ISR(CANIT_vect) {
-
-	int16_t id;
-	int8_t dat_i, dat[8], len;
-	
-	// Select MOb
-	CANPAGE = flag_pos_16((uint16_t)CANSIT) << 4;
-
-	// Get ID
-	id = _IDT_2A_TO_ID(CANIDT);
-
-	// Get message length
-	len = CANCDMOB & 0x0F;
-
-	// Get message
-	for (dat_i = 0; dat_i < len; dat_i++) {
-		dat[dat_i] = CANMSG;
-	}
-
-	// Reset reception bit and re-enable reception
-	CANSTMOB &= ~_BV(RXOK);
-	CANCDMOB = _BV(CONMOB1);
 }
