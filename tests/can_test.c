@@ -39,7 +39,7 @@ int can_test_tx(void) {
 
 int can_test_rx(void) {
 	
-	can_init(2);
+	can_init(1);
 	can_filter(0);
 	sei();
 
@@ -62,5 +62,7 @@ int can_test_rx(void) {
 }
 
 int main(void) {
+    can_test_rx();
+    while(1);
     return 0;
 }

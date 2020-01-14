@@ -11,7 +11,8 @@
  * objects and enables the CAN controller.
  *
  * Currently, the transfer speed is set to 1MBps, the protocol revision is set
- * to 2.0A and no interrupts are enabled.
+ * to 2.0B and no interrupts are enabled. 16-bit ID's are used instead of the
+ * full 29-bits of the 2.0B revision.
  */
 void can_init(uint16_t txid);
 
