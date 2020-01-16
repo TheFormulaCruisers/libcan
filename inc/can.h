@@ -6,12 +6,11 @@
  * @param txid The message ID used for transmission.
  * @return void
  *
- * Resets the CAN controller, sets its transfer speed and its protocol revision
- * (2.0A or 2.0B) for transmission, enables interrupts, clears all message
- * objects and enables the CAN controller.
+ * Resets the CAN controller, sets its transmission speed and its protocol
+ * revision (2.0A or 2.0B) for transmission, enables interrupts, clears all
+ * message objects and enables the CAN controller.
  *
- * Currently, the transfer speed is set to 1MBps, the protocol revision is set
- * to 2.0A and no interrupts are enabled.
+ * Currently, the transmission speed is fixed at 1Mbps.
  */
 void can_init(uint16_t txid);
 
@@ -22,12 +21,10 @@ void can_init(uint16_t txid);
  *
  * Selects the next available message object and configures it to filter the
  * bus on messages with the message ID specified. Message objects are 
- * utilized chronologically and reception is enabled immediately.
+ * utilized chronologically and reception is enabled immediately. The first
+ * message object is reserved for transmission and will not be available for
+ * reception.
  * 
- * The first message object is reserved for transmission and will not be
- * available for reception. The transmission message object uses message ID 0
- * and has the highest priority on the bus.
- *
  * Best practice is to filter messages in descending order of priority. That
  * way, the receive function will favor a high priority message over a low
  * priority message.
@@ -35,37 +32,30 @@ void can_init(uint16_t txid);
 void can_filter(uint16_t rxid);
 
 /**
- * @brief Register the receive handler.
- * @param receive_handler
- * @return void
- *
- * The receive handler is called right after a CAN receive interrupt occurs.
- * The callback function is expected to take three parameters: the node id, a
- * pointer to the data and the number of bytes received.
- *
- * @note Not yet implemented.
+ * @brief Check if new messages are available.
+ * @param void
+ * @return (1) if new messages are available, (0) otherwise.
  */
-void can_register_receive_handler(void (*receive_handler)(uint16_t id, uint8_t *dat, uint8_t len));
+uint8_t can_message_available(void);
 
 /**
  * @brief Retrieve a message from the first message object with a set rx flag.
  * @param rxid A pointer to where the message ID will be copied.
- * @param dat A pointer to where the message will be copied.
- * @param len A pointer to where the message length will be copied.
+ * @param msg A pointer to where the message will be copied.
+ * @param msg_len A pointer to where the message length will be copied.
  * @return void
  *
- * Searches through all the message objects and returns the message of the
- * first one it finds with a set reception flag. The id, message and message
- * length of the message object are then copied to the respective memory
- * locations pointed to by the function's parameters. Make sure to reserve
- * enough memory at these locations.
+ * Finds the highest priority message object with a set RX flag. The id,
+ * message and message length of the MOb are then copied to the respective
+ * memory locations pointed to by the function's parameters. Make sure to
+ * reserve enough memory at these locations.
  */
-void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len);
+void can_receive(uint16_t *rxid, uint8_t *msg, uint8_t *msg_len);
 
 /**
  * @brief Transmit a message on the bus.
- * @param dat A pointer to where the message is stored.
- * @param len The number of bytes to transmit.
+ * @param msg A pointer to where the message is stored.
+ * @param msg_len The number of bytes to transmit.
  * @return void
  *
  * Copies the number of bytes specified by len from the memory pointed to by
@@ -73,8 +63,8 @@ void can_receive(uint16_t *rxid, uint8_t *dat, uint8_t *len);
  *
  * @note This function should not be called before the message is correctly
  * transmitted. It might be necessary built in a safety feature that addresses
- * this limitation.
+ * this limitation, in the future.
  */
-void can_transmit(uint8_t *dat, uint8_t len);
+void can_transmit(uint8_t *msg, uint8_t msg_len);
 
 #endif // _CAN_H
