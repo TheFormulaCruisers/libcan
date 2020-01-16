@@ -183,7 +183,6 @@ ISR(CANIT_vect) {
 			for (msgi = 0; msgi < msgbuf.msgs[bufi].msg_size; msgi++) {
 				msgbuf.msgs[bufi].msg[msgi] = CANMSG;
 			}
-			// Re-enable reception
 			CANCDMOB |= _BV(CONMOB1);
 			break;
 		}
