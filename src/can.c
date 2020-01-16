@@ -177,16 +177,18 @@ ISR(CANIT_vect) {
 		
 		// On set rx flag, copy message to message buffer
 		if (CANSTMOB & _BV(RXOK)) {
-			bufi = (uint8_t)CANPAGE >> 4;
+			bufi = (cp >> 4) - 1;
 			msgbuf.rx_flags |= 1 << bufi;
 			msgbuf.msgs[bufi].msg_size = CANCDMOB & 0x0F;
 			for (msgi = 0; msgi < msgbuf.msgs[bufi].msg_size; msgi++) {
 				msgbuf.msgs[bufi].msg[msgi] = CANMSG;
 			}
+			// Re-enable reception
+			CANCDMOB |= _BV(CONMOB1);
 			break;
 		}
 	}
-	
+
 	CANSTMOB = 0x00;
 	CANPAGE = cp_tmp;
 }
