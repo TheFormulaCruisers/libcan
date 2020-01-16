@@ -175,7 +175,7 @@ ISR(CANIT_vect) {
 	for (cp = 0x10; cp <= cp_max; cp += 0x10) {
 		CANPAGE = cp;
 		
-		// On set rx flag, copy message to message buffer
+		// On set rx flag, copy message to buffer and re-enable reception
 		if (CANSTMOB & _BV(RXOK)) {
 			bufi = (cp >> 4) - 1;
 			msgbuf.rx_flags |= 1 << bufi;
