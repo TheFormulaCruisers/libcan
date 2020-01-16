@@ -51,13 +51,12 @@ int can_test_rx(void) {
 	uint8_t len;
 	
 	while(1) {
-		CANPAGE = 0x10;
-		while(!(CANSTMOB & _BV(RXOK)));
-		can_receive(&id, dat, &len);
-		PORTC = dat[0];
+		while(can_message_available()) {
+			can_receive(&id, dat, &len);
+			PORTC = dat[0];
+		}
 	}
 	
-	while(1);
 	return 0;
 }
 

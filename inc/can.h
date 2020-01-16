@@ -63,7 +63,8 @@ void can_receive(uint16_t *rxid, uint8_t *msg, uint8_t *msg_len);
  *
  * @bug This function should not be called before a message is correctly
  * transmitted. It might be necessary built in a safety feature that addresses
- * this limitation, in the future.
+ * this limitation, in the future. For example, by implementing a transmission
+ * buffer.
  */
 void can_transmit(uint8_t *msg, uint8_t msg_len);
 
