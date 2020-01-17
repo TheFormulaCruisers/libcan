@@ -59,12 +59,10 @@ void can_receive(uint16_t *rxid, uint8_t *msg, uint8_t *msg_size);
  * @return void
  *
  * Copies the number of bytes specified by len from the memory pointed to by
- * dat to the transmission message object and starts transmission.
- *
- * @bug This function should not be called before a message is correctly
- * transmitted. It might be necessary built in a safety feature that addresses
- * this limitation, in the future. For example, by implementing a transmission
- * buffer.
+ * dat to the transmission message object and starts transmission. If the
+ * transmission message object is busy, the message is stored in a buffer. Once
+ * the preceding transmission has been completed, the new data is loaded from
+ * the buffer and transmitted automatically.
  */
 void can_transmit(uint8_t *msg, uint8_t msg_size);
 
