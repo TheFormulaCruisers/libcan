@@ -111,6 +111,9 @@
   <avrgcc.compiler.symbols.DefSymbols>
     <ListValues>
       <Value>DEBUG</Value>
+      <Value>CAN_REV_2B</Value>
+      <Value>CAN_RX_MSGBUF_SIZE=14</Value>
+      <Value>CAN_TX_MSGBUF_SIZE=8</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>
@@ -139,22 +142,17 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="inc" />
-    <Folder Include="tests" />
-    <Folder Include="src" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\..\..\inc\can.h">
       <SubType>compile</SubType>
-      <Link>inc\can.h</Link>
+      <Link>can.h</Link>
     </Compile>
     <Compile Include="..\..\..\src\can.c">
       <SubType>compile</SubType>
-      <Link>src\can.c</Link>
+      <Link>can.c</Link>
     </Compile>
     <Compile Include="..\..\..\tests\can_test.c">
       <SubType>compile</SubType>
-      <Link>tests\can_test.c</Link>
+      <Link>can_test.c</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
