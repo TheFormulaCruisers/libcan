@@ -167,7 +167,7 @@ void can_transmit(uint8_t *msg, uint8_t msg_size) {
 
 	CANPAGE = 0x00;
 	
-	// Write to mob if it's disabled and start transmission
+	// Write to mob if it's not busy and start transmission
 	if (!(CANEN2 & _BV(ENMOB0))) {
 		for (msgi = 0; msgi < msg_size; msgi++) {
 			CANMSG = *(msg+msgi);
@@ -200,7 +200,7 @@ ISR(CANIT_vect) {
 	const uint8_t cp_tmp = CANPAGE;
 	uint8_t bufi, cp_max, cp, msgi;
 
-	// On transmission OK, search tx buffer for new message to send
+	// On transmission OK, look for and send new message
 	CANPAGE = 0x00;
 	if (CANSTMOB & _BV(TXOK) && tx_msgbuf.read_pos != tx_msgbuf.write_pos) {
 		bufi = tx_msgbuf.read_pos;
@@ -218,6 +218,7 @@ ISR(CANIT_vect) {
 			tx_msgbuf.read_pos = 0;
 		}
 
+	// Otherwise, search which other mob causes the interrupt
 	} else {
 		cp_max = rx_msgbuf.msgs_size << 4;
 		for (cp = 0x01; cp <= cp_max; cp += 0x10) {
