@@ -42,7 +42,7 @@ uint8_t can_message_available(void);
  * @brief Retrieve a message from the first message object with a set rx flag.
  * @param rxid A pointer to where the message ID will be copied.
  * @param msg A pointer to where the message will be copied.
- * @param msg_len A pointer to where the message length will be copied.
+ * @param msg_size A pointer to where the message size will be copied.
  * @return void
  *
  * Finds the highest priority message object with a set RX flag. The id,
@@ -50,12 +50,12 @@ uint8_t can_message_available(void);
  * memory locations pointed to by the function's parameters. Make sure to
  * reserve enough memory at these locations.
  */
-void can_receive(uint16_t *rxid, uint8_t *msg, uint8_t *msg_len);
+void can_receive(uint16_t *rxid, uint8_t *msg, uint8_t *msg_size);
 
 /**
  * @brief Transmit a message on the bus.
  * @param msg A pointer to where the message is stored.
- * @param msg_len The number of bytes to transmit.
+ * @param msg_size The number of bytes to transmit.
  * @return void
  *
  * Copies the number of bytes specified by len from the memory pointed to by
@@ -66,6 +66,6 @@ void can_receive(uint16_t *rxid, uint8_t *msg, uint8_t *msg_len);
  * this limitation, in the future. For example, by implementing a transmission
  * buffer.
  */
-void can_transmit(uint8_t *msg, uint8_t msg_len);
+void can_transmit(uint8_t *msg, uint8_t msg_size);
 
 #endif // _CAN_H
