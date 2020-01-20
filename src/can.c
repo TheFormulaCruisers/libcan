@@ -81,8 +81,8 @@ void can_init(uint16_t txid) {
 	CANBT1 = 0x02;
 	CANBT2 = 0x04;
 	CANBT3 = 0x13;
-	CANIE2 = 0xFF;
 	CANIE1 = 0x7F;
+	CANIE2 = 0xFF;
 	CANGIE = _BV(ENIT) | _BV(ENTX) | _BV(ENRX);
 
 	// Config mob0 for tx
