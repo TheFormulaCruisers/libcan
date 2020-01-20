@@ -457,11 +457,11 @@ END GROUP
  .debug_abbrev  0x000009a0      0x144 can.o
  .debug_abbrev  0x00000ae4       0xf7 can_test.o
 
-.debug_line     0x00000000      0x6d5
+.debug_line     0x00000000      0x6db
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x175 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.4.331/gcc/dev/at90can128/avr51/crtat90can128.o
- .debug_line    0x00000175      0x3d7 can.o
- .debug_line    0x0000054c      0x189 can_test.o
+ .debug_line    0x00000175      0x3dd can.o
+ .debug_line    0x00000552      0x189 can_test.o
 
 .debug_frame    0x00000000      0x18c
  *(.debug_frame)

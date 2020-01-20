@@ -81,7 +81,8 @@ void can_init(uint16_t txid) {
 	CANBT1 = 0x02;
 	CANBT2 = 0x04;
 	CANBT3 = 0x13;
-	CANIE = 0x7FFF;
+	CANIE2 = 0xFF;
+	CANIE1 = 0x7F;
 	CANGIE = _BV(ENIT) | _BV(ENTX) | _BV(ENRX);
 
 	// Config mob0 for tx
@@ -202,7 +203,11 @@ void can_transmit(uint8_t *msg, uint8_t msg_size) {
 
 // ------------------------------------------------- Interrupt Service Routines
 
+#if defined CANIT_vect
 ISR(CANIT_vect) {
+#elif defined CAN_INT_vect
+ISR(CAN_INT_vect) {
+#endif
 	const uint8_t cp_tmp = CANPAGE;
 	uint8_t bufi, cp_max, cp, msgi;
 
