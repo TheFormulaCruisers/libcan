@@ -4,7 +4,7 @@
 
 int can_test_tx(void) {
 	
-	can_init(1);
+	can_init(8);
 	sei();
 
 	uint8_t dat[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
@@ -38,8 +38,8 @@ int can_test_tx(void) {
 
 int can_test_rx(void) {
 	
-	can_init(1);
-	can_filter(0);
+	can_init(0);
+	can_filter(8);
 	sei();
 
 	DDRC = 0xFF;
@@ -60,6 +60,6 @@ int can_test_rx(void) {
 }
 
 int main(void) {
-    can_test_tx();
+    can_test_rx();
     return 0;
 }

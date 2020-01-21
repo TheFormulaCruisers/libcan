@@ -88,7 +88,7 @@ void can_init(uint16_t txid) {
 	// Config mob0 for tx
 	CANPAGE = 0x00;
 	CANSTMOB = 0x00;
-	CANIDM = 0xFFFFFFF8;
+	CANIDM = 0xFFFFFFFF;
 #if defined CAN_REV_2A
 	CANIDT = _ID_TO_IDT_2A(txid);
 	CANCDMOB = 0x00;
@@ -101,7 +101,7 @@ void can_init(uint16_t txid) {
 	for (cp = 0x10; cp <= 0xE0; cp += 0x10) {
 		CANPAGE = cp;
 		CANSTMOB = 0x00;
-		CANIDM = 0xFFFFFFF8;
+		CANIDM = 0xFFFFFFFF;
 		CANIDT = 0x00000000;
 		CANCDMOB = 0x00;
 	}
@@ -123,10 +123,11 @@ void can_filter(uint16_t rxid) {
 		CANPAGE = rx_msgbuf.msgs_size << 4;
 #if defined CAN_REV_2A
 		CANIDT = _ID_TO_IDT_2A(rxid);
+		CANCDMOB = _BV(CONMOB1);
 #elif defined CAN_REV_2B
 		CANIDT = _ID_TO_IDT_2B(rxid);
+		CANCDMOB = _BV(CONMOB1) | _BV(IDE);
 #endif
-		CANCDMOB |= _BV(CONMOB1);
 	}
 
 	CANPAGE = cp_tmp;
