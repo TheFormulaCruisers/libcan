@@ -8,7 +8,7 @@ This library simplifies CAN bus communication on a range of Microchip's 8-bit AV
 
 ## Usage
 
-Functions are defined in the header files located in _inc_. Each function is supplemented with a style of documentational block comments that aim to describe their usage as accurate and clear as possible. A block comment may contain the following tags:
+Functions are defined in the header files located in _inc_. Each function is supplemented with documentational block comments that describe their usage. A block comment may contain the following tags:
 
   * @brief
   * @param
