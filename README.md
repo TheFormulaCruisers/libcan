@@ -24,6 +24,8 @@ A makefile is provided, but is not setup to generate a programmable image. By us
 
 ## Macros
 
+The following macros should be specified when compiling the system:
+
   * CAN_REV_2A or CAN_REV_2B
   * CAN_RX_MSGBUF_SIZE
   * CAN_TX_MSGBUF_SIZE
