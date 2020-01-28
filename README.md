@@ -8,13 +8,13 @@ This interface simplifies CAN bus communication on a range of Microchip's 8-bit 
 
 ## Usage
 
-The functions to this interface are defined in the corresponding header files in _inc_. They are supplemented with a style of documentational block comments that aim to describe their usage as accurate and clear as possible. A block comment opens with /\*\* and closes with \*/. Each line is prefixed with a \*. Possible doc-tags are:
+Functions to this interface are defined in the corresponding header files in _inc_. They are supplemented with a style of documentational block comments that aim to describe their usage as accurate and clear as possible. A block comment may contain the following doc-tags:
 
-..* @brief
-..* @param
-..* @return
-..* @note
-..* @bug
+  * @brief
+  * @param
+  * @return
+  * @note
+  * @bug
 
 ## Build
 
