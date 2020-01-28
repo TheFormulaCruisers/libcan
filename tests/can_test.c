@@ -4,7 +4,7 @@
 
 int can_test_tx(void) {
 	
-	can_init(8);
+	can_init(16);
 	sei();
 
 	uint8_t dat[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
@@ -60,6 +60,6 @@ int can_test_rx(void) {
 }
 
 int main(void) {
-    can_test_rx();
+    can_test_tx();
     return 0;
 }
