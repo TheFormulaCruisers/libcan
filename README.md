@@ -22,6 +22,12 @@ The _tools_ folder contains an ATMEL Studio project that may be used to build th
 
 A makefile is provided, but is not setup to generate a programmable image. By using _make_, one may easily check whether the program compiles correctly and without warnings.
 
+The following macros should be specified when building the library:
+
+  * CAN_REV_2A or CAN_REV_2B
+  * CAN_RX_MSGBUF_SIZE
+  * CAN_TX_MSGBUF_SIZE
+
 ## Devices
 
 Device | Status
