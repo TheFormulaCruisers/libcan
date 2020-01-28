@@ -1,6 +1,6 @@
 # libcan
 
-This library simplifies CAN bus communication on a range of Microchip's 8-bit AVR microcontrollers. It supports sending and receiving messages of variable length using either the 2.0A or the 2.0B CAN bus communicaton protocol. The transmission's bitrate is currently fixed at its highest value, which on a 16MHz clocked MCU corresponds to 1Mbps.
+This library simplifies CAN bus communication on a range of Microchip's 8-bit AVR microcontrollers. It supports sending and receiving messages of variable length using either the 2.0A or the 2.0B CAN bus communicaton protocol. The bitrate is currently fixed at its highest value, which on a 16MHz clocked MCU corresponds to 1Mbps.
 
 ## Operation
 
