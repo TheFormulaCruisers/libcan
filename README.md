@@ -1,6 +1,6 @@
 # libcan
 
-This interface simplifies CAN bus communication on a range of Microchip's 8-bit AVR microcontrollers.
+This library simplifies CAN bus communication on a range of Microchip's 8-bit AVR microcontrollers. It supports sending and receiving messages of variable length using either the 2.0A or the 2.0B CAN bus communicaton protocol. The transmission's bitrate is currently fixed at its highest value, which on a 16MHz clocked MCU corresponds to 1Mbps.
 
 ## Operation
 
@@ -8,7 +8,7 @@ This interface simplifies CAN bus communication on a range of Microchip's 8-bit 
 
 ## Usage
 
-Functions in the interface are defined by the corresponding header files in _inc_. They are supplemented with a style of documentational block comments that aim to describe their usage as accurate and clear as possible. A block comment may contain the following tags:
+Functions are defined in the header files located in _inc_. Each function is supplemented with a style of documentational block comments that aim to describe their usage as accurate and clear as possible. A block comment may contain the following tags:
 
   * @brief
   * @param
