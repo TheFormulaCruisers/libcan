@@ -6,7 +6,7 @@ This library simplifies CAN bus communication on a range of Microchip's 8-bit AV
 
 Build into some AVR microcontrollers is a module for handling communication on a Controller Area Network parallel to program execution. It supports generating interrupts on reception, transmission and various errors and warnings. Once enabled, a message is stored in one of the Message Objects (MObs) that are built into the hardware. A software routine may then collect a message from a MOb and re-enable it for reception. A message may be catched when its identifier (partially) matches with one that has been preconfigured in the MOb.
 
-Libcan implements an additional buffer between the Message Objects and its interface, allowing for received messages to be updated and to build up a transmission qeue. The library uses transmission and reception interrupts to copy data from the transmission buffer to a transmission MOb and from a receiving MOb to the reception buffer. The interface contains functions that copy data from the calling function to the transmission buffer and from the reception buffer to the calling function and checking whether new messages have been received. 
+Libcan implements an additional buffer between the Message Objects and its interface, allowing for received messages to be updated and to build up a transmission qeue. The library uses transmission and reception interrupts to copy data from the transmission buffer to a transmission MOb and from a receiving MOb to the reception buffer. The interface contains a function to copy data from the calling function to the transmission buffer, to copy data from the reception buffer to the calling function and to check whether new messages have been received. 
 
 ## Usage
 
