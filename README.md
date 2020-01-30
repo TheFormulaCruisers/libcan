@@ -36,5 +36,5 @@ A makefile is provided, but is not setup to generate a programmable image. By us
 
 Device | Status
 --- | ---
-AT90CAN128 | Untested
+AT90CAN128 | Work in progress
 ATMEGA32M1 | Untested
