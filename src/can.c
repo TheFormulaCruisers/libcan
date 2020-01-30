@@ -105,11 +105,11 @@ void can_filter(uint16_t rxid, uint16_t mask) {
 		// Config mob
 		CANPAGE = rx_msgbuf.msgs_size << 4;
 #if defined CAN_REV_2A
-		CANIDM ^= _ID_TO_IDT_2A(~mask);
+		CANIDM ^= ~_ID_TO_IDT_2A(mask);
 		CANIDT = _ID_TO_IDT_2A(rxid);
 		CANCDMOB = _BV(CONMOB1);
 #elif defined CAN_REV_2B
-		CANIDM ^= _ID_TO_IDT_2B(~mask);
+		CANIDM ^= ~_ID_TO_IDT_2B(mask);
 		CANIDT = _ID_TO_IDT_2B(rxid);
 		CANCDMOB = _BV(CONMOB1) | _BV(IDE);
 #endif
