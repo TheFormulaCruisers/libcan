@@ -3,7 +3,7 @@
 
 /**
  * @brief Initialize the CAN controller.
- * @param txid The message ID used for transmission.
+ * @param void
  * @return void
  *
  * Resets the CAN controller, sets its transmission speed and its protocol
@@ -12,7 +12,7 @@
  *
  * Currently, the transmission speed is fixed at 1Mbps.
  */
-void can_init(uint16_t txid);
+void can_init(void);
 
 /**
  * @brief Configure a message object to filter on a specific message ID.
@@ -64,6 +64,6 @@ void can_receive(uint16_t *rxid, uint8_t *msg, uint8_t *msg_size);
  * the preceding transmission has been completed, the new data is loaded from
  * the buffer and transmitted automatically.
  */
-void can_transmit(uint8_t *msg, uint8_t msg_size);
+void can_transmit(uint16_t txid, uint8_t *msg, uint8_t msg_size);
 
 #endif // _CAN_H

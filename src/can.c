@@ -45,25 +45,20 @@
 
 typedef struct {
 	uint16_t id;
-	uint8_t msg_size;
+	uint8_t size;
 	uint8_t msg[8];
-} rx_message_t;
+} message_t;
 
 typedef struct {
 	uint16_t rx_flags;
 	uint8_t msgs_size;
-	rx_message_t msgs[CAN_RX_MSGBUF_SIZE];
+	message_t msgs[CAN_RX_MSGBUF_SIZE];
 } rx_message_buffer_t;
-
-typedef struct {
-	uint8_t msg_size;
-	uint8_t msg[8];
-} tx_message_t;
 
 typedef struct {
 	uint8_t write_pos;
 	uint8_t read_pos;
-	tx_message_t msgs[CAN_TX_MSGBUF_SIZE];
+	message_t msgs[CAN_TX_MSGBUF_SIZE];
 } tx_message_buffer_t;
 
 // --------------------------------------------------------------------- Memory
@@ -73,10 +68,10 @@ static volatile tx_message_buffer_t tx_msgbuf = {0};
 
 // --------------------------------------------------------- External Functions
 
-void can_init(uint16_t txid) {
+void can_init(void) {
 	uint8_t cp;
 
-	// Config controller
+	// Configure controller
 	CANGCON = _BV(SWRES);
 	CANBT1 = 0x02;
 	CANBT2 = 0x04;
@@ -85,20 +80,8 @@ void can_init(uint16_t txid) {
 	CANIE2 = 0xFF;
 	CANGIE = _BV(ENIT) | _BV(ENTX) | _BV(ENRX);
 
-	// Config mob0 for tx
-	CANPAGE = 0x00;
-	CANSTMOB = 0x00;
-	CANIDM = 0xFFFFFFFF;
-#if defined CAN_REV_2A
-	CANIDT = _ID_TO_IDT_2A(txid);
-	CANCDMOB = 0x00;
-#elif defined CAN_REV_2B
-	CANIDT = _ID_TO_IDT_2B(txid);
-	CANCDMOB = _BV(IDE);
-#endif
-
-	// Init mob1 to mob14 for rx
-	for (cp = 0x10; cp <= 0xE0; cp += 0x10) {
+	// Clear mobs
+	for (cp = 0x00; cp <= 0xE0; cp += 0x10) {
 		CANPAGE = cp;
 		CANSTMOB = 0x00;
 		CANIDM = 0xFFFFFFFF;
@@ -156,8 +139,8 @@ void can_receive(uint16_t *rxid, uint8_t *msg, uint8_t *msg_size) {
 			do {
 				rx_msgbuf.rx_flags &= ~flag_msk;
 				*rxid = rx_msgbuf.msgs[bufi].id;
-				*msg_size = rx_msgbuf.msgs[bufi].msg_size;
-				for (msgi = 0; msgi < rx_msgbuf.msgs[bufi].msg_size; msgi++) {
+				*msg_size = rx_msgbuf.msgs[bufi].size;
+				for (msgi = 0; msgi < rx_msgbuf.msgs[bufi].size; msgi++) {
 					*(msg+msgi) = rx_msgbuf.msgs[bufi].msg[msgi];
 				}
 
@@ -169,7 +152,7 @@ void can_receive(uint16_t *rxid, uint8_t *msg, uint8_t *msg_size) {
 	}
 }
 
-void can_transmit(uint8_t *msg, uint8_t msg_size) {
+void can_transmit(uint16_t txid, uint8_t *msg, uint8_t msg_size) {
 	const uint8_t cp_tmp = CANPAGE;
 	uint8_t msgi;
 
@@ -181,14 +164,17 @@ void can_transmit(uint8_t *msg, uint8_t msg_size) {
 			CANMSG = *(msg+msgi);
 		}
 #if defined CAN_REV_2A
+		CANIDT = _ID_TO_IDT_2A(txid);
 		CANCDMOB = _BV(CONMOB0) | msg_size;
 #elif defined CAN_REV_2B
+		CANIDT = _ID_TO_IDT_2B(txid);
 		CANCDMOB = _BV(CONMOB0) | _BV(IDE) | msg_size;
 #endif
 
 	// Write to tx message buffer otherwise
 	} else {
-		tx_msgbuf.msgs[tx_msgbuf.write_pos].msg_size = msg_size;
+		tx_msgbuf.msgs[tx_msgbuf.write_pos].id = txid;
+		tx_msgbuf.msgs[tx_msgbuf.write_pos].size = msg_size;
 		for (msgi = 0; msgi < msg_size; msgi++) {
 			tx_msgbuf.msgs[tx_msgbuf.write_pos].msg[msgi] = *(msg+msgi);
 		}
@@ -215,14 +201,15 @@ ISR(CAN_INT_vect) {
 	// On transmission OK, look for new message in tx buffer and transmit
 	CANPAGE = 0x00;
 	if (CANSTMOB & _BV(TXOK) && tx_msgbuf.read_pos != tx_msgbuf.write_pos) {
-		bufi = tx_msgbuf.read_pos;
-		for (msgi = 0; msgi < tx_msgbuf.msgs[bufi].msg_size; msgi++) {
-			CANMSG = tx_msgbuf.msgs[bufi].msg[msgi];
+		for (msgi = 0; msgi < tx_msgbuf.msgs[tx_msgbuf.read_pos].size; msgi++) {
+			CANMSG = tx_msgbuf.msgs[tx_msgbuf.read_pos].msg[msgi];
 		}
 #if defined CAN_REV_2A
-		CANCDMOB = _BV(CONMOB0) | tx_msgbuf.msgs[bufi].msg_size;
+		CANIDT = _ID_TO_IDT_2A(tx_msgbuf.msgs[tx_msgbuf.read_pos].id);
+		CANCDMOB = _BV(CONMOB0) | tx_msgbuf.msgs[tx_msgbuf.read_pos].size;
 #elif defined CAN_REV_2B
-		CANCDMOB = _BV(CONMOB0) | _BV(IDE) | tx_msgbuf.msgs[bufi].msg_size;
+		CANIDT = _ID_TO_IDT_2B(tx_msgbuf.msgs[tx_msgbuf.read_pos].id);
+		CANCDMOB = _BV(CONMOB0) | _BV(IDE) | tx_msgbuf.msgs[tx_msgbuf.read_pos].size;
 #endif
 		if (tx_msgbuf.read_pos < CAN_TX_MSGBUF_SIZE-1) {
 			tx_msgbuf.read_pos++;
@@ -240,8 +227,8 @@ ISR(CAN_INT_vect) {
 			if (CANSTMOB & _BV(RXOK)) {
 				bufi = (cp >> 4) - 1;
 				rx_msgbuf.rx_flags |= 1 << bufi;
-				rx_msgbuf.msgs[bufi].msg_size = CANCDMOB & 0x0F;
-				for (msgi = 0; msgi < rx_msgbuf.msgs[bufi].msg_size; msgi++) {
+				rx_msgbuf.msgs[bufi].size = CANCDMOB & 0x0F;
+				for (msgi = 0; msgi < rx_msgbuf.msgs[bufi].size; msgi++) {
 					rx_msgbuf.msgs[bufi].msg[msgi] = CANMSG;
 				}
 				CANCDMOB |= _BV(CONMOB1);

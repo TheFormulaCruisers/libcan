@@ -4,7 +4,7 @@
 
 int can_test_tx(void) {
 	
-	can_init(16);
+	can_init();
 	sei();
 
 	uint8_t dat[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
@@ -16,7 +16,7 @@ int can_test_tx(void) {
 	while (1) {
 		
 		dat[0] = leds;
-		can_transmit(&dat[0], 1);
+		can_transmit(8, &dat[0], 1);
 		
 		for (ledi = 0; ledi < 1200000; ledi++);
 		if (leds == 0x80) {
@@ -38,7 +38,7 @@ int can_test_tx(void) {
 
 int can_test_rx(void) {
 	
-	can_init(0);
+	can_init();
 	can_filter(8);
 	sei();
 
