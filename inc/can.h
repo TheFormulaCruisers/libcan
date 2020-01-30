@@ -17,6 +17,7 @@ void can_init(void);
 /**
  * @brief Configure a message object to filter on a specific message ID.
  * @param rxid The message ID to filter on.
+ * @param mask The message ID filter mask.
  * @return void
  *
  * Selects the next available message object and configures it to filter the
@@ -29,7 +30,7 @@ void can_init(void);
  * way, the receive function will favor a high priority message over a low
  * priority message.
  */
-void can_filter(uint16_t rxid);
+void can_filter(uint16_t rxid, uint16_t mask);
 
 /**
  * @brief Check if new messages are available.

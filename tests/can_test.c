@@ -39,7 +39,7 @@ int can_test_tx(void) {
 int can_test_rx(void) {
 	
 	can_init();
-	can_filter(8);
+	can_filter(8, 0xFFFF);
 	sei();
 
 	DDRC = 0xFF;

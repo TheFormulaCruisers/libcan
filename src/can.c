@@ -93,7 +93,7 @@ void can_init(void) {
 	CANGCON = _BV(ENASTB);
 }
 
-void can_filter(uint16_t rxid) {
+void can_filter(uint16_t rxid, uint16_t mask) {
 	const uint8_t cp_tmp = CANPAGE;
 	
 	if (rx_msgbuf.msgs_size < CAN_RX_MSGBUF_SIZE) {
@@ -105,9 +105,11 @@ void can_filter(uint16_t rxid) {
 		// Config mob
 		CANPAGE = rx_msgbuf.msgs_size << 4;
 #if defined CAN_REV_2A
+		CANIDM ^= ~_ID_TO_IDT_2A(mask);
 		CANIDT = _ID_TO_IDT_2A(rxid);
 		CANCDMOB = _BV(CONMOB1);
 #elif defined CAN_REV_2B
+		CANIDM ^= ~_ID_TO_IDT_2B(mask);
 		CANIDT = _ID_TO_IDT_2B(rxid);
 		CANCDMOB = _BV(CONMOB1) | _BV(IDE);
 #endif
@@ -118,7 +120,7 @@ void can_filter(uint16_t rxid) {
 
 uint8_t can_message_available(void) {
 	
-	// Check message buffer rx flags
+	// Check message buffer for rx flags
 	if (rx_msgbuf.rx_flags) {
 		return 1;
 	} else {
@@ -154,7 +156,7 @@ void can_receive(uint16_t *rxid, uint8_t *msg, uint8_t *msg_size) {
 
 void can_transmit(uint16_t txid, uint8_t *msg, uint8_t msg_size) {
 	const uint8_t cp_tmp = CANPAGE;
-	uint8_t msgi;
+	uint8_t bufi, msgi;
 
 	CANPAGE = 0x00;
 	
@@ -173,13 +175,14 @@ void can_transmit(uint16_t txid, uint8_t *msg, uint8_t msg_size) {
 
 	// Write to tx message buffer otherwise
 	} else {
-		tx_msgbuf.msgs[tx_msgbuf.write_pos].id = txid;
-		tx_msgbuf.msgs[tx_msgbuf.write_pos].size = msg_size;
+		bufi = tx_msgbuf.write_pos;
+		tx_msgbuf.msgs[bufi].id = txid;
+		tx_msgbuf.msgs[bufi].size = msg_size;
 		for (msgi = 0; msgi < msg_size; msgi++) {
-			tx_msgbuf.msgs[tx_msgbuf.write_pos].msg[msgi] = *(msg+msgi);
+			tx_msgbuf.msgs[bufi].msg[msgi] = *(msg+msgi);
 		}
-		if (tx_msgbuf.write_pos < CAN_TX_MSGBUF_SIZE-1) {
-			tx_msgbuf.write_pos++;
+		if (bufi < CAN_TX_MSGBUF_SIZE-1) {
+			tx_msgbuf.write_pos = bufi + 1;
 		} else {
 			tx_msgbuf.write_pos = 0;
 		}
@@ -200,19 +203,20 @@ ISR(CAN_INT_vect) {
 
 	// On transmission OK, look for new message in tx buffer and transmit
 	CANPAGE = 0x00;
-	if (CANSTMOB & _BV(TXOK) && tx_msgbuf.read_pos != tx_msgbuf.write_pos) {
-		for (msgi = 0; msgi < tx_msgbuf.msgs[tx_msgbuf.read_pos].size; msgi++) {
-			CANMSG = tx_msgbuf.msgs[tx_msgbuf.read_pos].msg[msgi];
+	bufi = tx_msgbuf.read_pos;
+	if (CANSTMOB & _BV(TXOK) && bufi != tx_msgbuf.write_pos) {
+		for (msgi = 0; msgi < tx_msgbuf.msgs[bufi].size; msgi++) {
+			CANMSG = tx_msgbuf.msgs[bufi].msg[msgi];
 		}
 #if defined CAN_REV_2A
-		CANIDT = _ID_TO_IDT_2A(tx_msgbuf.msgs[tx_msgbuf.read_pos].id);
-		CANCDMOB = _BV(CONMOB0) | tx_msgbuf.msgs[tx_msgbuf.read_pos].size;
+		CANIDT = _ID_TO_IDT_2A(tx_msgbuf.msgs[bufi].id);
+		CANCDMOB = _BV(CONMOB0) | tx_msgbuf.msgs[bufi].size;
 #elif defined CAN_REV_2B
-		CANIDT = _ID_TO_IDT_2B(tx_msgbuf.msgs[tx_msgbuf.read_pos].id);
-		CANCDMOB = _BV(CONMOB0) | _BV(IDE) | tx_msgbuf.msgs[tx_msgbuf.read_pos].size;
+		CANIDT = _ID_TO_IDT_2B(tx_msgbuf.msgs[bufi].id);
+		CANCDMOB = _BV(CONMOB0) | _BV(IDE) | tx_msgbuf.msgs[bufi].size;
 #endif
-		if (tx_msgbuf.read_pos < CAN_TX_MSGBUF_SIZE-1) {
-			tx_msgbuf.read_pos++;
+		if (bufi < CAN_TX_MSGBUF_SIZE-1) {
+			tx_msgbuf.read_pos = bufi + 1;
 		} else {
 			tx_msgbuf.read_pos = 0;
 		}
