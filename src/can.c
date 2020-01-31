@@ -36,10 +36,10 @@
 #define _ID_TO_IDT_2B(id) (uint32_t)id << 3
 
 // Convert the CAN revision 2.0A IDT-register format to an ID.
-#define _IDT_2A_TO_ID(canidt) canidt >> 21
+#define _IDT_2A_TO_ID(canidt) (uint32_t)canidt >> 21
 
 // Convert the CAN revision 2.0B IDT-register format to an ID.
-#define _IDT_2B_TO_ID(canidt) canidt >> 3
+#define _IDT_2B_TO_ID(canidt) (uint32_t)canidt >> 3
 
 // ---------------------------------------------------------------------- Types
 
@@ -231,6 +231,11 @@ ISR(CAN_INT_vect) {
 			if (CANSTMOB & _BV(RXOK)) {
 				bufi = (cp >> 4) - 1;
 				rx_msgbuf.rx_flags |= 1 << bufi;
+#if defined CAN_REV_2A
+				rx_msgbuf.msgs[bufi].id = _IDT_2A_TO_ID(CANIDT);
+#elif defined CAN_REV_2B
+				rx_msgbuf.msgs[bufi].id = _IDT_2B_TO_ID(CANIDT);
+#endif
 				rx_msgbuf.msgs[bufi].size = CANCDMOB & 0x0F;
 				for (msgi = 0; msgi < rx_msgbuf.msgs[bufi].size; msgi++) {
 					rx_msgbuf.msgs[bufi].msg[msgi] = CANMSG;

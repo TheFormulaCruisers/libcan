@@ -39,7 +39,7 @@ int can_test_tx(void) {
 int can_test_rx(void) {
 	
 	can_init();
-	can_filter(8, 0xFFFF);
+	can_filter(0, 0x0000);
 	sei();
 
 	DDRC = 0xFF;
@@ -52,7 +52,11 @@ int can_test_rx(void) {
 	while(1) {
 		while(can_message_available()) {
 			can_receive(&id, dat, &len);
-			PORTC = dat[0];
+			switch (id) {
+				case 8:
+					PORTC = dat[0];
+					break;
+			}
 		}
 	}
 	
@@ -60,6 +64,6 @@ int can_test_rx(void) {
 }
 
 int main(void) {
-    can_test_tx();
+    can_test_rx();
     return 0;
 }
