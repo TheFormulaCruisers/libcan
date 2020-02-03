@@ -14,14 +14,17 @@ Discarded input sections
  .text          0x00000000        0x0 can.o
  .data          0x00000000        0x0 can.o
  .bss           0x00000000        0x0 can.o
- .text.can_transmit
-                0x00000000       0xce can.o
+ .text.can_filter
+                0x00000000       0xc8 can.o
+ .text.can_message_available
+                0x00000000       0x12 can.o
+ .text.can_receive
+                0x00000000       0xf6 can.o
  .text          0x00000000        0x0 can_test.o
  .data          0x00000000        0x0 can_test.o
  .bss           0x00000000        0x0 can_test.o
- .rodata        0x00000000        0xc can_test.o
- .text.can_test_tx
-                0x00000000       0x74 can_test.o
+ .text.can_test_rx
+                0x00000000       0x58 can_test.o
  .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr51\libgcc.a(_exit.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr51\libgcc.a(_exit.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr51\libgcc.a(_exit.o)
@@ -198,7 +201,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x57c
+.text           0x00000000      0x49a
  *(.vectors)
  .vectors       0x00000000       0x94 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/ATmega_DFP/1.4.331/gcc/dev/at90can128/avr51/crtat90can128.o
                 0x00000000                __vector_default
@@ -298,28 +301,22 @@ END GROUP
  .text.can_init
                 0x000000d0       0x90 can.o
                 0x000000d0                can_init
- .text.can_filter
-                0x00000160       0xc8 can.o
-                0x00000160                can_filter
- .text.can_message_available
-                0x00000228       0x12 can.o
-                0x00000228                can_message_available
- .text.can_receive
-                0x0000023a       0xf6 can.o
-                0x0000023a                can_receive
+ .text.can_transmit
+                0x00000160       0xce can.o
+                0x00000160                can_transmit
  .text.__vector_18
-                0x00000330      0x1f6 can.o
-                0x00000330                __vector_18
- .text.can_test_rx
-                0x00000526       0x50 can_test.o
-                0x00000526                can_test_rx
- .text.main     0x00000576        0x2 can_test.o
-                0x00000576                main
-                0x00000578                . = ALIGN (0x2)
+                0x0000022e      0x1f6 can.o
+                0x0000022e                __vector_18
+ .text.can_test_tx
+                0x00000424       0x70 can_test.o
+                0x00000424                can_test_tx
+ .text.main     0x00000494        0x2 can_test.o
+                0x00000494                main
+                0x00000496                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000578        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr51\libgcc.a(_exit.o)
-                0x00000578                _exit
-                0x00000578                exit
+ .fini9         0x00000496        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr51\libgcc.a(_exit.o)
+                0x00000496                _exit
+                0x00000496                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -338,40 +335,41 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000578        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr51\libgcc.a(_exit.o)
+ .fini0         0x00000496        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x0000057c                _etext = .
+                0x0000049a                _etext = .
 
-.data           0x00800100        0x0 load address 0x0000057c
+.data           0x00800100        0xc load address 0x0000049a
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
  *(.gnu.linkonce.d*)
  *(.rodata)
+ .rodata        0x00800100        0xc can_test.o
  *(.rodata*)
  *(.gnu.linkonce.r*)
-                0x00800100                . = ALIGN (0x2)
-                0x00800100                _edata = .
-                0x00800100                PROVIDE (__data_end, .)
+                0x0080010c                . = ALIGN (0x2)
+                0x0080010c                _edata = .
+                0x0080010c                PROVIDE (__data_end, .)
 
-.bss            0x00800100       0xf7
-                0x00800100                PROVIDE (__bss_start, .)
+.bss            0x0080010c       0xf7
+                0x0080010c                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
  .bss.tx_msgbuf
-                0x00800100       0x5a can.o
+                0x0080010c       0x5a can.o
  .bss.rx_msgbuf
-                0x0080015a       0x9d can.o
+                0x00800166       0x9d can.o
  *(COMMON)
-                0x008001f7                PROVIDE (__bss_end, .)
-                0x0000057c                __data_load_start = LOADADDR (.data)
-                0x0000057c                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00800203                PROVIDE (__bss_end, .)
+                0x0000049a                __data_load_start = LOADADDR (.data)
+                0x000004a6                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x008001f7        0x0
+.noinit         0x00800203        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                PROVIDE (__noinit_end, .)
-                0x008001f7                _end = .
+                0x00800203                _end = .
                 [!provide]                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0

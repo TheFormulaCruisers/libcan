@@ -18,7 +18,7 @@ int can_test_tx(void) {
 		dat[0] = leds;
 		can_transmit(8, &dat[0], 1);
 		
-		for (ledi = 0; ledi < 1200000; ledi++);
+		for (ledi = 0; ledi < 150000; ledi++);
 		if (leds == 0x80) {
 			dir = 1;
 		} else if (leds == 0x01) {
@@ -64,6 +64,6 @@ int can_test_rx(void) {
 }
 
 int main(void) {
-    can_test_rx();
+    can_test_tx();
     return 0;
 }
