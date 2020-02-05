@@ -10,7 +10,7 @@ Libcan implements an additional buffer between the Message Objects and its inter
 
 ## Usage
 
-Functions are defined in the header files located in _inc_. Each function is supplemented with documentational block comments that describe their usage. A block comment may contain the following tags:
+Functions are defined in the header files located in _inc_. Each function is supplemented with a documentational block comment that describes its usage. A block comment may contain the following tags:
 
   * @brief
   * @param
