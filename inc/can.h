@@ -6,11 +6,9 @@
  * @param void
  * @return void
  *
- * Resets the CAN controller, sets its transmission speed and its protocol
- * revision (2.0A or 2.0B) for transmission, enables interrupts, clears all
- * message objects and enables the CAN controller.
- *
- * Currently, the transmission speed is fixed at 1Mbps.
+ * Resets the CAN controller, enables interrupts, clears all message objects
+ * and enables the CAN controller. Currently, the transmission speed is fixed
+ * at 1Mbps.
  */
 void can_init(void);
 
